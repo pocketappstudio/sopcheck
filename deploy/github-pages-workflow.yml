@@ -1,3 +1,4 @@
+# To use: copy to .github/workflows/pages.yml (needs a token/account with the "workflow" permission).
 # Static frontend -> GitHub Pages. Repo Settings > Pages > Source: GitHub Actions.
 # Repo Settings > Secrets and variables > Actions > Variables:
 #   SOPCHECK_API_BASE  = https://<your-api-host>          (Render/Fly URL, no trailing slash)
