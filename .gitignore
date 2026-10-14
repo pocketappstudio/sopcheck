@@ -1,0 +1,8 @@
+node_modules/
+.next/
+frontend/out/
+backend/venv/
+backend/data/
+__pycache__/
+.env
+*.zip

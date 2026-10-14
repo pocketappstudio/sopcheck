@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/sopcheck/1.0.0/checklist.extended.schema.json",
+  "title": "Universal Technician Checklist (extended variant, optional)",
+  "description": "Core schema plus an optional nested 'extended' object per task. Core consumers ignore 'extended'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["industry", "document_summary", "tasks"],
+  "properties": {
+    "industry": { "type": "string" },
+    "document_summary": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "task_title", "description", "assigned_position", "site_requirement", "timeframe", "verification_method"],
+        "properties": {
+          "task_id": { "type": "string", "pattern": "^T-[0-9]{3,}$" },
+          "task_title": { "type": "string" },
+          "description": { "type": "string" },
+          "assigned_position": { "type": "string" },
+          "site_requirement": { "type": "string" },
+          "timeframe": { "type": "string" },
+          "verification_method": { "type": "string", "enum": ["Checkbox", "Photo Upload", "Numeric Input", "Text Input", "Signature", "Dual Sign-off"] },
+          "extended": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "safety_critical": { "type": "boolean" },
+              "ppe": { "type": "array", "items": { "type": "string" } },
+              "thresholds": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["parameter", "operator", "value", "unit"],
+                  "properties": {
+                    "parameter": { "type": "string" }, "operator": { "type": "string" },
+                    "value": { "type": "string" }, "unit": { "type": "string" }
+                  }
+                }
+              },
+              "regulatory_refs": { "type": "array", "items": { "type": "string" } },
+              "depends_on": { "type": "array", "items": { "type": "string", "pattern": "^T-[0-9]{3,}$" } },
+              "source_excerpt": { "type": "string", "maxLength": 400 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

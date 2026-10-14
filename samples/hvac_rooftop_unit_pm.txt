@@ -1,0 +1,24 @@
+Northwind Property Services -- Facilities
+HVAC rooftop unit (RTU) quarterly preventive maintenance -- how we do it
+rev 3, owner: Facilities Supervisor (questions -> ext 4410)
+
+Before anything else, read this. Rooftop units run on 460V three-phase power and the condenser fans can start without warning on a call for cooling, so nobody opens an access panel until the unit disconnect is OFF, locked and tagged with their own lock. The roof edge is a fall hazard: stay at least 6 feet from any unprotected edge, and if the work is inside that zone you need a harness tied off to the certified anchor (ask the supervisor for the anchor log). Refrigerant (R-410A) can cause frostbite and in a closed space displaces oxygen -- safety glasses and insulated gloves whenever gauges are connected. Do not go up in winds above 25 mph, lightning within 10 miles, or when the roof is icy. Two-person rule applies to any roof access after 6 PM.
+
+So the quarterly visit goes roughly like this. The HVAC Technician signs in at the security desk and picks up the roof key, then checks the roof hatch ladder and hatch latch before climbing. Once on the roof walk the route and look at all the units from outside first -- any oil stains around the compressor section, damaged panels, standing water or debris on the curb gets a photo before you touch it.
+
+At each unit: shut it down at the thermostat/BAS first, then open the disconnect, lock and tag it, and verify zero energy with your meter (test the meter on a known live source before and after). Then the filters get swapped (log the filter size and the date on the unit tag), belts are checked for cracks and tension -- deflection should be about 1/2 inch per foot of span, replace if glazed or cracked -- and the condensate drain pan and trap are flushed until water runs clear. If you find standing water over 1 inch in the pan, write it up as a work order the same day.
+
+Coil cleaning is only in the spring visit (Q2), use the low-pressure foaming cleaner and never a pressure washer on the condenser fins.
+
+Readings after you restore power (remove your own lock, never anyone else's -- if another lock is on it, stop and call the supervisor):
+
+Reading                     | Acceptable range        | Action if outside
+Supply air temp (cooling)   | 52-58 F                 | note + work order
+Temp split (return-supply)  | 16-22 F                 | check charge / airflow
+Compressor amps             | <= nameplate RLA        | shut down, call supervisor
+Suction pressure (R-410A)   | 115-140 psig            | do not adjust charge without EPA 608 cert
+Gas heat: CO in flue        | below 100 ppm air-free  | lock out heat section, notify supervisor immediately
+
+Anything with a red "out of range" on the CO line means the heat section stays locked out until the supervisor clears it -- this is a hold point.
+
+Wrap up: close all panels with all screws, clear tools and old filters off the roof, sign the unit tag, and enter the readings in the CMMS work order before end of shift. The Facilities Supervisor reviews and signs off the quarterly PM package within 5 business days. Refrigerant added or recovered must be logged per EPA Section 608 (40 CFR Part 82, Subpart F) with the amount in pounds.

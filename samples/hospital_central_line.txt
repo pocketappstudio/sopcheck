@@ -1,0 +1,23 @@
+Riverside General Hospital — Nursing Policy NUR-207
+Central Line Dressing Change and Bundle Maintenance (ICU)
+
+Scope: Applies to Registered Nurses (RN) caring for patients with central venous catheters in the Intensive Care Unit.
+Reference: CDC Guidelines for the Prevention of Intravascular Catheter-Related Infections; Joint Commission NPSG.07.04.01.
+
+Shift Start — Patient Bedside
+1. RN: Perform hand hygiene with alcohol-based rub for at least 20 seconds before touching the line.
+2. Assess the insertion site for redness, swelling, or drainage and document findings.
+3. Measure and record the patient's temperature. If temperature is greater than 38.3 C, notify the attending physician immediately.
+
+Dressing Change — Every 7 days or when soiled
+4. Don sterile gloves and a mask. CAUTION: Maintain sterile field throughout; do not touch the catheter hub with non-sterile hands.
+5. Scrub the site with 2% chlorhexidine gluconate for 30 seconds and allow to air dry completely.
+6. Apply a new transparent semi-permeable dressing and label it with date, time and your initials.
+7. Photograph the new dressing for the wound-care record.
+
+Medication Line Check — Every 4 hours
+8. Charge Nurse and RN: Perform an independent double-check of any high-alert infusion (heparin, insulin) connected to the line.
+9. Record the infusion pump rate in mL/hr.
+
+Shift End — Nurses' Station
+10. Enter the central line lot number and catheter day count into the EHR.

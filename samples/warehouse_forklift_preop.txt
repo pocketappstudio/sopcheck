@@ -1,0 +1,20 @@
+NorthStar Logistics - Powered Industrial Truck Pre-Operation Inspection (WH-SOP-09)
+Regulatory basis: OSHA 29 CFR 1910.178
+
+1. PURPOSE
+Prevent forklift tip-overs and pedestrian strikes. Forklifts weigh more than 9,000 lbs and must never exceed the rated load capacity shown on the data plate.
+
+2. PRE-OPERATION (Charging Area) - Shift Start
+2.1 Certified Forklift Operator: Wear a high-visibility vest and steel-toe boots.
+2.2 Check the hydraulic fluid level and inspect the forks for cracks.
+2.3 Record the battery charge percentage. Do not operate if the charge is below 20%.
+2.4 Test the horn, lights and backup alarm.
+WARNING: If any defect is found, tag the truck "DO NOT OPERATE" and notify the Shift Supervisor immediately.
+
+3. OPERATION (Warehouse Floor) - During Shift
+3.1 Fasten the seat belt before moving the truck.
+3.2 Keep travel speed at or below 5 mph in pedestrian aisles.
+
+4. SHUTDOWN (Charging Area) - Shift End
+4.1 Lower the forks fully to the floor and set the parking brake.
+4.2 Sign the daily inspection checklist.

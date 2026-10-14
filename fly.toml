@@ -1,0 +1,33 @@
+# Fly.io: fly launch --no-deploy --copy-config ; fly volumes create sopcheck_data --size 3 ;
+# fly secrets set OPENAI_API_KEY=... JWT_SECRET=$(openssl rand -hex 32) CORS_ORIGINS=https://<user>.github.io \
+#   PLAN_STARTER_PRODUCT_ID=... PLAN_TEAM_PRODUCT_ID=... PLAN_STARTER_CHECKOUT_URL=... PLAN_TEAM_CHECKOUT_URL=...
+# (optional) fly postgres create && fly postgres attach  -> sets DATABASE_URL (use the postgresql+psycopg:// scheme)
+app = "sopcheck-api"            # must be globally unique; change if taken
+primary_region = "dfw"          # Dallas
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  APP_ENV = "production"
+  LLM_MODEL = "gpt-4.1"
+  LLM_FALLBACK_TO_MOCK = "true"
+  PORT = "8000"
+
+[[mounts]]
+  source = "sopcheck_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1      # SQLite on a volume = run exactly one machine
+
+  [[http_service.checks]]
+    grace_period = "20s"
+    interval = "30s"
+    method = "GET"
+    path = "/api/health"
+    timeout = "5s"

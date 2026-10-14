@@ -1,0 +1,41 @@
+# Render Blueprint: New > Blueprint > pick this repo. Secrets marked sync:false are prompted for in the dashboard.
+services:
+  - type: web
+    name: sopcheck-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter                  # a persistent disk needs a paid instance
+    healthCheckPath: /api/health
+    disk:
+      name: sopcheck-data
+      mountPath: /data             # uploads (and SQLite if DATABASE_URL is not overridden)
+      sizeGB: 5
+    envVars:
+      - key: DATABASE_URL          # Postgres recommended for production
+        fromDatabase: { name: sopcheck-db, property: connectionString }
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: gpt-4.1
+      - key: LLM_FALLBACK_TO_MOCK
+        value: "true"
+      - key: CORS_ORIGINS          # your GitHub Pages / custom-domain origin, e.g. https://<user>.github.io
+        sync: false
+      - key: PUBLIC_BASE_URL       # this API's public URL
+        sync: false
+      - key: OWNER_LEGAL_NAME      # operator name in Terms/Privacy
+        value: SOPCheck
+      - key: PLAN_STARTER_PRODUCT_ID
+        sync: false
+      - key: PLAN_STARTER_CHECKOUT_URL
+        sync: false
+      - key: PLAN_TEAM_PRODUCT_ID
+        sync: false
+      - key: PLAN_TEAM_CHECKOUT_URL
+        sync: false
+databases:
+  - name: sopcheck-db
+    plan: basic-256mb
+    databaseName: sopcheck

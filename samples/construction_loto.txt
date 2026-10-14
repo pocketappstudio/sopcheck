@@ -1,0 +1,26 @@
+SOP-ELEC-014: Lockout/Tagout (LOTO) for Electrical Panel Maintenance
+Company: Apex Builders Inc.   Revision: C   Regulatory basis: OSHA 29 CFR 1910.147, NFPA 70E
+
+1. PURPOSE
+This procedure ensures hazardous energy is controlled before servicing 480V distribution panels.
+
+2. RESPONSIBILITIES
+The Authorized Electrician performs all isolation steps. The Site Safety Officer verifies isolation for group lockouts.
+
+3. PRE-TASK (Main Electrical Room)
+3.1 Authorized Electrician: Review the one-line diagram and identify all energy sources feeding Panel DP-2.
+3.2 Don PPE: Class 0 insulated gloves, arc-rated face shield, and arc flash suit rated minimum 8 cal/cm2.
+WARNING: Never work on energized equipment above 50 volts without an approved energized work permit.
+
+4. ISOLATION (Main Electrical Room)
+4.1 Notify all affected employees that the panel will be shut down.
+4.2 Open the main breaker and apply your personal lock and danger tag to the breaker handle.
+4.3 Verify zero energy using a CAT III rated voltmeter. Record voltage reading; it must read less than 1 volt on all phases.
+4.4 Site Safety Officer: Independently verify isolation and co-sign the lockout log.
+DO NOT proceed until both signatures are recorded.
+
+5. RESTORATION (Post-Task)
+5.1 Remove all tools and confirm all personnel are clear of the panel.
+5.2 Remove your lock and tag and re-energize the panel.
+5.3 Photograph the closed panel with the dead-front cover installed.
+5.4 Sign the LOTO completion record.
