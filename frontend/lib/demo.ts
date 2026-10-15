@@ -5,6 +5,8 @@
 export const DEMO = process.env.NEXT_PUBLIC_DEMO === "1";
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
+const AI_URL = (process.env.NEXT_PUBLIC_AI_PROXY_URL ?? "").replace(/\/$/, "");
+let aiOn = false;
 const PY_PACKAGES = ["micropip", "sqlalchemy", "pydantic", "tzdata", "ssl", "httpx"];
 const PIP_PACKAGES = ["fastapi==0.115.6", "python-multipart", "pyjwt", "pypdf", "bcrypt"];
 
@@ -13,7 +15,7 @@ type PyHandle = (m: string, u: string, h: string, b: Uint8Array | null) => Promi
 type Pyodide = any;
 let boot: Promise<{ handle: PyHandle; py: Pyodide }> | null = null;
 
-function overlay(text: string | null) {
+function overlay(text: string | null, foot = "Runs entirely in your browser. The first load takes a few seconds.") {
   if (typeof document === "undefined") return;
   let el = document.getElementById("demo-boot");
   if (text === null) { el?.remove(); return; }
@@ -22,7 +24,7 @@ function overlay(text: string | null) {
     el.setAttribute("style", "position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(241,245,249,.92);font:14px system-ui;color:#334155");
     document.body.appendChild(el);
   }
-  el.innerHTML = `<div style="text-align:center;max-width:320px"><div style="font-size:28px">✓</div><b>SOPCheck demo</b><br>${text}<br><span style="font-size:12px;color:#64748b">Runs entirely in your browser. The first load takes a few seconds.</span></div>`;
+  el.innerHTML = `<div style="text-align:center;max-width:320px"><div style="font-size:28px">✓</div><b>SOPCheck demo</b><br>${text}<br><span style="font-size:12px;color:#64748b">${foot}</span></div>`;
 }
 
 function loadScript(src: string) {
@@ -54,10 +56,28 @@ async function start() {
     if (reset) { sessionStorage.removeItem("sopcheck.session"); }
   }
   overlay("Starting the app server…");
-  py.runPython(bundle["/sop/demo_boot.py"] ? atob(bundle["/sop/demo_boot.py"]) : "");
+  aiOn = await aiHealthy();
+  const pre = aiOn ? `import os\nos.environ["SOPCHECK_AI_URL"]=${JSON.stringify(AI_URL)}\n` : "";
+  py.runPython(pre + (bundle["/sop/demo_boot.py"] ? atob(bundle["/sop/demo_boot.py"]) : ""));
+  setBadge();
   await persist(py);
   overlay(null);
   return { handle: py.globals.get("handle") as PyHandle, py };
+}
+
+// AI parsing is used only when the proxy is configured at build time AND reports itself healthy with budget left.
+async function aiHealthy() {
+  if (!AI_URL || AI_URL.includes("__")) return false;
+  try {
+    const c = new AbortController(); const t = setTimeout(() => c.abort(), 6000);
+    const r = await fetchOrig(AI_URL + "/health", { signal: c.signal }); clearTimeout(t);
+    const j = await r.json();
+    return !!(j.ok && j.ai_available && j.key_configured);
+  } catch { return false; }
+}
+function setBadge() {
+  const b = document.getElementById("demo-badge-label");
+  if (b) b.textContent = aiOn ? "Preview demo · AI parsing (limited, falls back to offline parser) · " : "Preview demo · runs in your browser · offline parser · ";
 }
 
 function persist(py: Pyodide) { return new Promise<void>((r) => py.FS.syncfs(false, () => r())); }
@@ -71,7 +91,10 @@ async function demoFetch(input: RequestInfo | URL, init?: RequestInit): Promise<
   const headers: Record<string, string> = {};
   req.headers.forEach((v, k) => { headers[k] = v; });
   const body = req.method === "GET" || req.method === "HEAD" ? null : new Uint8Array(await req.arrayBuffer());
-  const r = (await handle(req.method, url.pathname + url.search, JSON.stringify(headers), body)).toJs();
+  const parsing = req.method === "POST" && /^\/api\/documents\/(upload|parse-text)$/.test(url.pathname);
+  if (parsing && aiOn) { overlay("Parsing with AI… this can take up to a minute.", "Demo only: the document text is sent to an AI service for parsing. Don't upload confidential files."); await new Promise((r) => setTimeout(r, 60)); }
+  let r: [number, string, Uint8Array];
+  try { r = (await handle(req.method, url.pathname + url.search, JSON.stringify(headers), body)).toJs(); } finally { if (parsing && aiOn) overlay(null); }
   if (req.method !== "GET") await persist(py);
   const h = new Headers(JSON.parse(r[1]));
   return new Response(r[0] === 204 || r[0] === 304 ? null : new Blob([r[2] as BlobPart]), { status: r[0], headers: h });
@@ -92,7 +115,7 @@ export function installDemo() {
     if (document.getElementById("demo-badge")) return;
     const b = document.createElement("div"); b.id = "demo-badge";
     b.setAttribute("style", "position:fixed;left:8px;bottom:8px;z-index:9998;background:#0f766e;color:#fff;font:11px system-ui;padding:4px 8px;border-radius:999px;opacity:.9");
-    b.innerHTML = `Preview demo · runs in your browser · offline parser · <a href="${BASE_PATH}/login/?reset-demo=1" style="color:#fff;text-decoration:underline">reset</a>`;
+    b.innerHTML = `<span id="demo-badge-label">Preview demo · runs in your browser · offline parser · </span><a href="${BASE_PATH}/login/?reset-demo=1" style="color:#fff;text-decoration:underline">reset</a>`;
     document.body.appendChild(b);
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", badge); else badge();

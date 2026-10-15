@@ -46,6 +46,46 @@ sys.path.insert(0, "/sop/backend")
 from app import main as _main                    # noqa: E402
 from app.db import Base, engine, SessionLocal    # noqa: E402
 
+# ---- optional real AI parsing through the SOPCheck AI proxy (Cloudflare Worker) ----
+# The proxy URL (no secrets) is injected by the page as SOPCHECK_AI_URL. The browser runs the full backend pipeline
+# (chunking, validation, repair, merge); only the single chat-completion call goes to the proxy, which holds the key.
+# Any failure (network, rate limit, daily cap, bad output) falls back to the offline mock parser (LLM_FALLBACK_TO_MOCK).
+_AI_URL = os.environ.get("SOPCHECK_AI_URL", "").strip().rstrip("/")
+if _AI_URL:
+    from types import SimpleNamespace
+    from js import XMLHttpRequest
+    from app import config as _cfg, llm as _llm, usage as _usage
+    _cfg.parser_mode = lambda: "llm"
+    _cfg.LLM_MODEL = "gpt-4.1"
+    _cfg.LLM_FALLBACK_TO_MOCK = True
+    _llm._client = lambda: None
+    _ai_state = {"off": False}
+
+    def _ai_complete(client, messages):
+        if _ai_state["off"]:
+            raise RuntimeError("AI demo limit reached - offline parser used")
+        try:
+            x = XMLHttpRequest.new()
+            x.open("POST", _AI_URL + "/parse", False)     # synchronous: the backend pipeline is synchronous
+            x.setRequestHeader("Content-Type", "application/json")
+            x.send(json.dumps({"messages": messages}))
+            status, text = int(x.status), str(x.responseText or "")
+        except Exception as e:
+            _ai_state["off"] = True
+            raise RuntimeError("AI service unreachable - offline parser used") from e
+        try:
+            data = json.loads(text)
+        except Exception:
+            data = {}
+        if status != 200:
+            if status in (429, 503, 403):
+                _ai_state["off"] = True
+            raise RuntimeError(data.get("message") or f"AI service error {status}")
+        u = data.get("usage") or {}
+        _usage.record("gpt-4.1", SimpleNamespace(prompt_tokens=u.get("prompt_tokens", 0), completion_tokens=u.get("completion_tokens", 0)))
+        return data.get("content", "")
+    _llm._complete = _ai_complete
+
 Base.metadata.create_all(engine)
 with SessionLocal() as _db:
     _main.seed(_db)
