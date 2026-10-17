@@ -66,7 +66,7 @@ function Card({ name, price, period, techs, parses, cta, highlight }: { name: st
       <ul className="my-5 flex-1 space-y-2 text-sm text-slate-700">
         <li>✓ Up to <b>{techs}</b> technicians</li>
         <li>✓ <b>{parses}</b> document parses / month</li>
-        <li>✓ AI extraction + safety-coverage review</li>
+        <li>✓ AI extraction + automated safety check (heuristic, not a guarantee)</li>
         <li>✓ Versioning, audit log, exports</li>
       </ul>
       {cta}

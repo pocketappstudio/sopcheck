@@ -226,8 +226,8 @@ function ManagerDashboard() {
                   <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Stat label="Tasks" value={editing ? rows.length : cur.checklist.tasks.length} />
                     <Stat label="Parser" value={cur.run.parser.toUpperCase()} sub={cur.run.model ?? cur.run.prompt_version} />
-                    <Stat label="Safety coverage" value={`${s?.coverage_pct ?? 100}%`} tone={open.length ? "text-orange-600" : "text-emerald-600"}
-                          sub={s ? `${s.counts.covered} covered · ${s.counts.partial} partial · ${s.counts.missing} missing` : ""} />
+                    <Stat label="Automated safety check (heuristic, not a guarantee)" value={!s ? "Not run" : open.length ? `${open.length} to review` : "No gaps detected"} tone={open.length ? "text-orange-600" : "text-slate-700"}
+                          sub={s ? `${open.length ? "" : "by the automated check · "}${s.counts.covered} covered · ${s.counts.partial} partial · ${s.counts.missing} missing` : ""} />
                     <Stat label="Open safety flags" value={open.length} tone={open.length ? "text-orange-600" : "text-emerald-600"} sub={s?.method} />
                   </div>
                   {cur.run.notes && <p className="mt-3 text-xs text-slate-400">{cur.run.notes}</p>}

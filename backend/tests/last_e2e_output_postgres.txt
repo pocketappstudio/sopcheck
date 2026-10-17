@@ -1,0 +1,121 @@
+health: {'ok': True, 'parser_mode': 'mock', 'model': None, 'prompt_version': 'sop-extract/1.2.0', 'server_time_utc': '2026-10-12T11:50:43.696332+00:00'}
+
+== auth & roles
+PASS no token -> 401 on /api/documents
+PASS no token -> 401 on /api/tasks
+PASS wrong password -> 401
+PASS fresh user must accept Terms v2026-10-12-draft
+PASS API blocked with 403 terms_required until Terms accepted
+PASS /api/auth/me still allowed before acceptance
+PASS accepting a stale Terms version -> 422
+PASS accept=false -> 422
+PASS accept current Terms -> stored version + timestamp
+PASS API usable after acceptance
+PASS public /api/legal/terms served
+PASS public /api/plans: trial 14d, Starter $49 10/50, Team $99 50/200
+PASS no email address in plans / legal documents
+PASS manager login -> 200 + HttpOnly session cookie
+PASS me = Morgan Blake / manager / Demo Company / tz America/Chicago
+PASS cookie-only auth works
+PASS technician -> 403 on manager endpoint /api/documents
+PASS technician -> 403 on upload
+PASS logout revokes the session (token no longer accepted)
+PASS brute-force throttle: 6th bad attempt -> 429
+
+== uploads (txt, text-PDF, scanned PDF -> OCR)
+PASS upload construction_loto.txt -> 200
+     extraction=text ocr_conf=None tasks=14 industry=Construction safety={'covered': 10, 'partial': 0, 'missing': 0} coverage=100.0% v1 draft
+PASS upload hospital_central_line.pdf -> 200
+     extraction=pdf_text ocr_conf=None tasks=12 industry=Healthcare safety={'covered': 8, 'partial': 0, 'missing': 0} coverage=100.0% v1 draft
+PASS upload retail_store_opening.txt -> 200
+     extraction=text ocr_conf=None tasks=10 industry=Retail safety={'covered': 5, 'partial': 0, 'missing': 0} coverage=100.0% v1 draft
+PASS upload warehouse_forklift_preop_SCANNED.pdf -> 200
+     extraction=ocr ocr_conf=95.3 tasks=8 industry=Logistics / Warehousing safety={'covered': 6, 'partial': 0, 'missing': 0} coverage=100.0% v1 draft
+PASS scanned PDF OCR'd: method=ocr conf=95.3% tasks=8
+PASS OCR text preserved safety literals ('DO NOT OPERATE', '9,000 lbs')
+PASS text-layer PDF not OCR'd (pdf_text)
+PASS LOTO safety coverage now 100.0% (480V purpose hazard carried as SAFETY CONTEXT)
+PASS 480V note attached to a task
+PASS all 4 samples at 100% coverage on fresh parse
+
+== cross-company denial
+PASS Globex manager GET Demo document -> 404
+PASS Globex manager document list is empty
+PASS Globex manager publish Demo document -> 404
+PASS Globex manager edit Demo document -> 404
+
+== editing & versioning
+PASS invalid verification_method 'Selfie' rejected -> 422
+PASS edit draft v1 in place -> still v1 draft
+PASS added/edited/reordered and renumbered (14 tasks)
+PASS deleting 'Remove your lock and tag' raised a safety flag
+PASS stale base_run_id -> 409
+PASS publish without reviewer attestation -> 428
+PASS publish blocked while safety flags unresolved -> 409
+
+== safety flag resolution
+PASS dismiss without reason -> 422
+PASS create_task resolution -> new task T-013 covers span ({'covered': 10, 'partial': 0, 'missing': 0})
+PASS publish v1 after resolution
+PASS publish audit entry records attestation text + user + time
+PASS export .csv carries the disclaimer
+PASS export .md carries the disclaimer
+PASS export .json carries the disclaimer
+PASS editing published v1 created draft v2; v1 stays live
+PASS technician still sees published v1 (with the warning)
+PASS dropped 50 V warning flagged: missing missing=['50 volts (>)']
+PASS attach resolution -> SAFETY NOTE appended to T-007, covered, still v2 draft
+PASS dismiss with reason recorded
+PASS publish v2 -> v1 superseded, v2 published
+PASS technicians now see v2
+PASS audit log has ['attach', 'create_task', 'dismiss', 'publish', 'task_add', 'task_delete', 'task_reorder', 'task_update', 'upload_parse', 'version_create']; e.g. {'description': ['Independently verify isolation and co-sign the lockout log. DO NOT proceed until both signatures are recorded.', 'Independently verify isolation and co-sign the lockout log.']}
+PASS audit entries attributed to the manager
+
+== distribution, evidence, dual sign-off
+     positions: ['Associate on Duty', 'Authorized Electrician', 'Certified Forklift Operator', 'Charge Nurse', 'Opening Manager', 'RN', 'Site Safety Officer']
+PASS filter electrician/main room/pre-task -> 8 tasks
+PASS Globex technician sees no Demo tasks
+PASS Globex technician submit to Demo task -> 404
+PASS manager without technician record cannot submit -> 403
+PASS photo served to own company only (Globex 404, anonymous 401)
+PASS Checkbox: with evidence -> 201
+PASS Numeric Input: missing evidence -> 422 ['numeric_value is required for Numeric Input tasks']
+PASS Numeric Input: with evidence -> 201
+PASS Text Input: missing evidence -> 422 ['text_value is required for Text Input tasks']
+PASS Text Input: with evidence -> 201
+PASS Photo Upload: missing evidence -> 422 ['photo_url is required for Photo Upload tasks']
+PASS Photo Upload: with evidence -> 201
+PASS Signature: missing evidence -> 422 ['signature is required for Signature / Dual Sign-off tasks']
+PASS Signature: with evidence -> 201
+PASS Dual Sign-off: missing evidence -> 422 ['signature is required for Signature / Dual Sign-off tasks', 'cosigner_email and cosigner_password are required for Dual Sign-off tasks']
+PASS Dual Sign-off: with evidence -> 201 (cosigner=Jordan Lee)
+PASS dual sign-off with wrong co-signer password -> 422
+PASS dual sign-off with self as co-signer -> 422
+PASS dual sign-off with other-company co-signer -> 422
+PASS Alex's completed tasks today: 6
+PASS completion state is per technician (Jordan: 0)
+
+== timestamps & company timezone
+PASS submitted_at is timezone-aware UTC: 2026-10-12T11:50:49.843710Z
+     window: Shift Start {'start': '2026-10-12T12:00:00+00:00', 'end': '2026-10-12T14:00:00+00:00', 'local': '07:00–09:00', 'timezone': 'America/Chicago', 'status': 'upcoming'}
+PASS shift window computed in company timezone (America/Chicago)
+PASS invalid timezone rejected
+PASS technician cannot change company settings
+PASS manager updated company timezone -> America/Denver
+PASS Shift Start window now 06:00–08:00 America/Denver -> UTC 2026-10-12T12:00:00+00:00
+PASS Globex timezone untouched (America/New_York)
+
+== billing
+PASS new company on 14-day trial: 14 days left, limits {'max_technicians': 10, 'max_parses_month': 50}
+PASS usage metered: 4 parses, 5 seats
+PASS technician cannot see billing
+PASS manager adds a technician seat (6/10)
+PASS license verify without Gumroad product ids -> 503 not configured
+
+== signup
+PASS signup without accepting Terms -> 422
+PASS signup creates company + manager with Terms accepted
+PASS new company: own trial, no data from other tenants
+PASS duplicate login -> 409
+
+94/94 checks passed

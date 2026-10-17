@@ -1,4 +1,4 @@
-"""Hybrid safety-coverage audit.
+"""Hybrid automated safety check.
 
 1. Span extraction: split the source into sentences (keeping section context) and keep the
    safety-critical ones via rules (signal words, PPE, energy isolation, thresholds, regulatory refs,

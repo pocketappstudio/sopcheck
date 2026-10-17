@@ -5,7 +5,7 @@ import { useState } from "react";
 import { api, type Me } from "@/lib/api";
 
 export const AI_DRAFT_BANNER = "AI-generated draft — verify against your official SOP before publishing.";
-export const ATTESTATION = "I have reviewed every task against the source document";
+export const ATTESTATION = "I have reviewed this checklist and am responsible for its use";
 
 /** Mandatory click-through acceptance of the current Terms + Privacy version (stored per user server-side). */
 export function TermsAcceptance({ me, onAccepted, onSignOut }: { me: Me; onAccepted: (m: Me) => void; onSignOut: () => void }) {
@@ -29,7 +29,7 @@ export function TermsAcceptance({ me, onAccepted, onSignOut }: { me: Me; onAccep
           <li>• SOPCheck is an <b>informational tool only</b>. It does not direct anyone to do anything.</li>
           <li>• Checklists are <b>AI-generated and may be wrong</b>. Verify every task against your official SOP before use. This is not professional or safety advice.</li>
           <li>• Your organization is responsible for its workers, sites and decisions. The Service is provided <b>as is</b>, without warranties.</li>
-          <li>• Document text is processed by OpenAI. Upload only documents you have the right to share.</li>
+          <li>• Document text is processed by OpenAI. Upload only documents you have the right to share. SOPCheck is for business use by adults 18+.</li>
         </ul>
         <p className="mt-3 text-sm">
           Read the full <Link href="/terms" target="_blank" className="font-medium text-teal-700 underline">Terms of Service</Link> and{" "}

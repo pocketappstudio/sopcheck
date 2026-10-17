@@ -189,7 +189,7 @@ Numeric Input, Text Input, Signature, Dual Sign-off; task_ids unique in T-NNN fo
 raw file ─► text extraction (pypdf / utf-8) ─► normalize (dehyphenate, collapse whitespace,
 keep headings & numbering) ─► chunker ─► LLM extract per chunk (temperature 0, JSON mode)
 ─► parse + validate (Pydantic / checklist.schema.json) ─► repair loop ─► merge & dedupe
-─► renumber task_ids ─► safety-coverage audit ─► persist as parse_run (status=draft) ─►
+─► renumber task_ids ─► automated safety check ─► persist as parse_run (status=draft) ─►
 manager review/edit ─► publish (tasks become assignable)
 ```
 
@@ -232,7 +232,7 @@ manager review/edit ─► publish (tasks become assignable)
 4. Deterministic post-fixes that do not need the LLM: trim strings, map common synonyms of
    verification_method ("photo" → "Photo Upload", "two-person verification" → "Dual Sign-off",
    "reading" → "Numeric Input"), empty strings → "Unspecified", renumber duplicate IDs.
-5. Hybrid safety-coverage audit (`backend/app/safety.py`, surfaced in the Manager Dashboard):
+5. Hybrid automated safety check (`backend/app/safety.py`, surfaced in the Manager Dashboard):
    a. **Span extraction** - every source sentence is classified by rules (signal words, PPE, energy
       isolation, thresholds = number+unit+comparator, regulatory refs, hold points/escalation,
       hazards). Role-assignment sentences in Responsibilities sections are excluded. With an API

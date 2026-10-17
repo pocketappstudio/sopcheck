@@ -96,10 +96,24 @@ Before launch:
 - The API purges workspaces whose deletion grace period has ended. This runs at startup and hourly (`PURGE_INTERVAL_S`). On hosts that sleep idle instances (Render free tier, Fly auto-stop), also schedule `python -m app.cli purge-deleted` daily so deletion happens on time.
 - `UPLOAD_DIR` must be the persistent volume (`/data/uploads`) so the purge deletes the real photo files.
 - Backups: keep backup retention at 30 days or less to match privacy.md section 4, or update the policy.
-- [ ] Optional: attorney review of the privacy.md section 4 retention periods (marked [ATTORNEY REVIEW]).
 
 ## Preview: in-browser demo on GitHub Pages
 `frontend/scripts_build_demo.sh` builds a static site in which the real FastAPI backend runs inside the browser with Pyodide, using the offline mock parser. There is no server and there are no AI calls. Data is saved per browser in IndexedDB, and `?reset-demo=1` resets it.
 - **Seed data:** `frontend/demo/seed.db` holds the generic samples and demo logins. To regenerate it, start the API with `LLM_MODEL=mock` on a fresh DB and run the upload part of `reset_demo.sh`.
 - **Publishing:** the contents of `frontend/out/` go on the `gh-pages` branch.
 - **Limit:** OCR of scanned PDFs is not available in the browser demo. Text PDFs, .txt and .md files work.
+
+
+## AI parsing for the Pages preview (Cloudflare Worker proxy)
+
+The static preview parses with the offline mock parser by default. To enable real gpt-4.1 parsing without exposing the key:
+
+- `worker/` is a Cloudflare Worker that holds `OPENAI_API_KEY` as a Worker **secret**. It only accepts the exact SOP-extraction
+  message shape (system prompt `sop-extract/1.2.0`, templated user and repair prompts), allows CORS only from
+  `https://pocketappstudio.github.io`, limits each IP (10 calls/hour, 30/day) and caps total spend per UTC day (`DAILY_CAP_USD`, default 0.50).
+- The browser demo still runs the real backend pipeline (chunking, validation, repair, merge, safety audit) in Pyodide; only the single
+  chat-completion call goes to the Worker. If the Worker is unreachable, rate-limited or over its cap, the demo falls back to the offline parser.
+- Deploy everything with `CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... OPENAI_API_KEY=... GITHUB_TOKEN_ROWBIN=... ./deploy-worker.sh`
+  (creates the KV namespace, deploys, sets the secret from env, smoke-tests, rebuilds the demo with `NEXT_PUBLIC_AI_PROXY_URL`, pushes gh-pages, verifies live).
+- Tests: `cd worker && npm test` (offline) or `LIVE=1 npm test` (one real call).
+- Demo visitors are told that uploaded text is sent to an AI service; don't upload confidential documents to the preview.

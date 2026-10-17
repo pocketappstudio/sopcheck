@@ -56,7 +56,7 @@ with sync_playwright() as p:
     page.locator("[data-testid=doc-list] button", has_text="Lockout").click()
     expect(page.locator("tbody").get_by_text("Apply your personal lock and danger tag").first).to_be_visible()
     expect(page.get_by_text("v1 · published")).to_be_visible()
-    ok("100%" in page.inner_text("main"), "LOTO safety coverage 100% shown")
+    ok("No gaps detected" in page.inner_text("main") and "100%" not in page.inner_text("main"), "LOTO automated safety check shows neutral state, no 100% figure")
     page.screenshot(path=OUT / "manager_dashboard_desktop.png", full_page=True)
 
     # ---------- edit mode: edit / reorder / delete / add ----------

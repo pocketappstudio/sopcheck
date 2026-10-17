@@ -34,7 +34,7 @@ def parser_mode() -> str:
     return "llm" if OPENAI_API_KEY else "mock"
 
 # ---- legal ----
-TERMS_VERSION = os.getenv("TERMS_VERSION", "2026-10-12-r4")   # bump when legal/terms.md or privacy.md change -> users re-accept
+TERMS_VERSION = os.getenv("TERMS_VERSION", "2026-10-17-r5")   # bump when legal/terms.md or privacy.md change -> users re-accept
 LEGAL_DIR = Path(os.getenv("LEGAL_DIR", PROJECT_DIR / "legal"))
 # Operator name substituted into legal/*.md ({{OWNER_LEGAL_NAME}}).
 OWNER_LEGAL_NAME = os.getenv("OWNER_LEGAL_NAME", "SOPCheck")

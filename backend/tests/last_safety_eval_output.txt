@@ -1,0 +1,21 @@
+PASS  construction_loto.txt                  baseline (unmodified)                                                                         {'covered': 10, 'partial': 0, 'missing': 0}
+PASS  hospital_central_line.pdf              baseline (unmodified)                                                                         {'covered': 8, 'partial': 0, 'missing': 0}
+PASS  retail_store_opening.txt               baseline (unmodified)                                                                         {'covered': 5, 'partial': 0, 'missing': 0}
+PASS  warehouse_forklift_preop_SCANNED.pdf   baseline (unmodified)                                                                         {'covered': 7, 'partial': 0, 'missing': 0}
+PASS  construction_loto.txt                  flag: 'WARNING: Never work on energized equipment above' -> ''                                missing (missing atoms: ['50 volts (>)'])
+PASS  construction_loto.txt                  flag: 'DO NOT proceed until both signatures are recorde' -> ''                                missing (missing atoms: -)
+PASS  construction_loto.txt                  flag: 'less than 1 volt' -> 'greater than 1 volt'                                             partial (missing atoms: ['1 volt (<)'])
+PASS  construction_loto.txt                  flag: 'minimum 8 cal/cm2' -> 'minimum 4 cal/cm2'                                              partial (missing atoms: ['8 cal/cm2 (>=)'])
+PASS  hospital_central_line.pdf              flag: 'CAUTION: Maintain sterile field throughout; do n' -> ''                                missing (missing atoms: -)
+PASS  hospital_central_line.pdf              flag: 'If temperature is greater than 38.3 C, notify th' -> ''                                missing (missing atoms: ['38.3 C (>)'])
+PASS  hospital_central_line.pdf              flag: 'for at least 20 seconds' -> ''                                                         partial (missing atoms: ['20 seconds (>=)'])
+PASS  retail_store_opening.txt               flag: 'at or below 41 F; if above 41 F' -> 'at or below 45 F; if above 45 '                   partial (missing atoms: ['41 F (<=)', '41 F (>)'])
+PASS  retail_store_opening.txt               flag: 'Fire exits must remain clear per local fire code' -> ''                                missing (missing atoms: -)
+PASS  warehouse_forklift_preop_SCANNED.pdf   flag: 'Do not operate if the charge is below 20%.' -> ''                                      partial (missing atoms: ['20% (<)'])
+PASS  warehouse_forklift_preop_SCANNED.pdf   flag: 'steel-toe boots' -> 'boots'                                                            partial (missing atoms: ['steel-toe boots'])
+PASS  construction_loto.txt                  keep: 'WARNING: Never work on energized equipment above' -> 'WARNING: Never perform work on'  still covered
+PASS  retail_store_opening.txt               keep: 'Walk the sales floor and check aisles for spills' -> 'Walk the sales floor; check ev'  still covered
+PASS  warehouse_forklift_preop_SCANNED.pdf   keep: 'Keep travel speed at or below 5 mph in pedestria' -> 'In pedestrian aisles keep your'  still covered
+
+spans evaluated: 33 benign, 11 mutated | TP=11 FP=0 FN=0 TN=33
+precision=1.000 recall=1.000

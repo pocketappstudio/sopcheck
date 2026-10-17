@@ -1,4 +1,4 @@
-"""Text extraction, normalization, chunking and the safety-coverage audit."""
+"""Text extraction, normalization, chunking and the automated safety check."""
 from __future__ import annotations
 import io
 import os

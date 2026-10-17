@@ -627,7 +627,7 @@ def edit_checklist(doc_id: int, body: EditChecklist, user: User = Depends(requir
     return doc_detail(db, d, run)
 
 
-ATTESTATION = "I have reviewed every task against the source document"
+ATTESTATION = "I have reviewed this checklist and am responsible for its use"
 
 
 @app.post("/api/documents/{doc_id}/publish")

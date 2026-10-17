@@ -155,7 +155,7 @@ ok(r.status_code == 200 and nf["coverage"] == "covered" and nf["resolution"] == 
 r = M.post(f"/api/documents/{lid}/publish?attest=true")
 ok(r.status_code == 200 and r.json()["run"]["version_status"] == "published", "publish v1 after resolution")
 pub = [a for a in M.get(f"/api/documents/{lid}/audit").json() if a["action"] == "publish"]
-ok(pub and pub[-1]["data"]["attestation"].startswith("I have reviewed every task") and pub[-1]["data"]["attested_by_user_id"] and pub[-1]["actor"],
+ok(pub and pub[-1]["data"]["attestation"].startswith("I have reviewed this checklist") and pub[-1]["data"]["attested_by_user_id"] and pub[-1]["actor"],
    "publish audit entry records attestation text + user + time")
 for fmt, mark in (("csv", "DISCLAIMER"), ("md", "NOT a substitute"), ("json", '"disclaimer"')):
     ex = M.get(f"/api/documents/{lid}/export?format={fmt}")

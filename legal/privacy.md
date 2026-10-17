@@ -1,6 +1,6 @@
 # SOPCheck Privacy Policy
 
-**Version 2026-10-12-r4 · Effective date: October 12, 2026**
+**Version 2026-10-17-r5 · Effective date: October 17, 2026**
 
 
 This Privacy Policy explains how **{{OWNER_LEGAL_NAME}}** ("we", "us") collects, uses, and shares information when organizations and their users use SOPCheck (the "Service"). It forms part of our [Terms of Service](/terms).
@@ -106,11 +106,11 @@ We use the following measures:
 - role-based access;
 - audit logging.
 
-No system is perfectly secure. You are responsible for deciding which documents you upload (see Terms Section 3).
+No system is perfectly secure. You are responsible for deciding which documents you upload (see Terms Section 5).
 
 ## 7. Children
 
-The Service is for businesses and is not directed to children under 16.
+The Service is for businesses and is not directed to anyone under 18.
 
 ## 8. International users
 
@@ -120,6 +120,10 @@ The Service is operated from the United States. Information may be processed in 
 
 We will update the version above when this Policy changes. For material changes, we will ask users to accept the new version in the Service.
 
-## 10. Contact
+## 10. Preview demo
+
+The public preview demo on GitHub Pages runs in your browser and saves its sample data in your browser's own storage (IndexedDB and session storage), which you can clear at any time. When AI parsing is on, the text of a document you upload to the demo is sent to an AI parsing service that runs on Cloudflare, which passes it to OpenAI to produce the checklist. That service keeps only per-IP counters (to limit use) and a daily usage total, not your document. If AI parsing is unavailable, the demo uses an offline parser in your browser instead. Do not upload confidential documents to the demo.
+
+## 11. Contact
 
 Data export and deletion are self-service on the in-app **Account** page. Privacy questions, support, billing and refund matters, and legal notices go through Gumroad's messaging feature for this product (message the seller from your Gumroad purchase or library).

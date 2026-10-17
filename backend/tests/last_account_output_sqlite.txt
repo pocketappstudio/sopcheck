@@ -1,0 +1,37 @@
+PASS parse doc
+PASS create technician
+PASS photo stored
+PASS technician can self-delete
+PASS sole manager cannot self-delete
+PASS tech export is JSON attachment
+PASS tech export has own profile, no workspace
+PASS tech export has no password hash
+PASS manager export has workspace
+PASS manager export lists photo
+PASS manager export has no secrets
+PASS manager export excludes other tenant
+PASS last manager self-delete blocked (409)
+PASS self-delete needs confirm
+PASS technician self-delete ok
+PASS deleted session revoked
+PASS deleted login no longer works
+PASS user anonymized
+PASS wrong name rejected
+PASS deletion scheduled
+PASS workspace locked (423)
+PASS export still allowed during grace
+PASS me shows pending deletion
+PASS cancel works
+PASS unlocked after cancel
+PASS other tenant unaffected
+PASS re-scheduled
+PASS purged: session gone
+PASS purged: photos deleted
+PASS other tenant photo kept
+PASS other tenant still works
+PASS purged: no rows left
+PASS purged: company row gone
+PASS tombstone written
+PASS tombstone has no names
+
+35/35 checks passed

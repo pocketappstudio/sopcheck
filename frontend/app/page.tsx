@@ -23,7 +23,7 @@ export default function Home() {
           <Link href="/manager" className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
             <div className="text-sm font-semibold text-teal-600">Manager Dashboard</div>
             <div className="mt-1 text-lg font-semibold text-slate-900">Upload, review & publish</div>
-            <p className="mt-2 text-sm text-slate-500">Parse TXT/PDF documents, preview the structured checklist and raw JSON, check safety coverage, publish.</p>
+            <p className="mt-2 text-sm text-slate-500">Parse TXT/PDF documents, preview the structured checklist and raw JSON, run the automated safety check, publish.</p>
           </Link>
           <Link href="/technician" className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
             <div className="text-sm font-semibold text-orange-600">Technician View</div>

@@ -17,7 +17,7 @@ sopcheck/
 │   ├── app/main.py                    # API: auth, upload, edit/version, safety resolution, publish, distribution
 │   ├── app/auth.py                    # bcrypt + JWT (httpOnly cookie or Bearer) + server-side session revocation
 │   ├── app/ingest.py                  # text / PDF extraction, per-page OCR fallback, reflow
-│   ├── app/safety.py                  # hybrid safety-coverage audit (rules/LLM spans, atoms, fuzzy/embeddings)
+│   ├── app/safety.py                  # hybrid automated safety check (rules/LLM spans, atoms, fuzzy/embeddings)
 │   ├── app/timeutil.py                # company-timezone shift windows / local-day boundaries
 │   ├── app/{llm,mock_parser,models,schemas,db,config}.py
 │   ├── tests/e2e_api.py               # 94-check end-to-end API test
@@ -183,7 +183,7 @@ time. The UI renders times in the viewer's browser zone with a short label (`2:2
 zone, including phrases like "Before 7:00 AM", with status `upcoming | active | closed`. "Completed today" uses the
 company-local midnight. Managers change the zone in the dashboard (`PATCH /api/company`).
 
-**Hybrid safety coverage** (`backend/app/safety.py`).
+**Automated safety check (heuristic, not a guarantee)** (`backend/app/safety.py`).
 1. *Spans*: rules mark each source sentence that carries a signal word, PPE, energy isolation, a threshold
    (number + unit + comparator / "must"), a regulatory ref, a hold point or escalation, or a hazard. Role statements
    in Responsibilities sections are excluded. With a key, an LLM classifier adds the sentences it flags (union).
@@ -270,7 +270,7 @@ Users without a UI: `./venv/bin/python -m app.cli create-user --company demo --e
 Measured with `backend/tests/measure_parse.py` (fresh DB, `LLM_FALLBACK_TO_MOCK=false`). Cost = list-price
 estimate from `app/usage.py` (extraction + safety-audit classifier + embeddings), stored per parse run in `usage`.
 
-| Sample | Tasks (mock) | Valid | Repairs | Safety coverage / spans | Extract latency | Tokens | Est. cost |
+| Sample | Tasks (mock) | Valid | Repairs | Automated safety check / spans | Extract latency | Tokens | Est. cost |
 |---|---|---|---|---|---|---|---|
 | construction_loto.txt | 10 (14) | yes | 0 | 100% / 11 | 5.5 s | 4,981 | $0.015 |
 | hospital_central_line.pdf | 10 (12) | yes | 0 | 100% / 9 | 4.6 s | 4,939 | $0.015 |
@@ -300,7 +300,7 @@ or dismisses them. Screenshots: `screenshots/live_hvac_*.png` (`frontend/scripts
 - **In-app safeguards:**
   - Click-through Terms acceptance is required at signup and first login. The version, time and IP are stored per user, and the API returns `403 terms_required` until it is done.
   - A persistent "AI-generated draft" banner appears on the Manager Dashboard.
-  - Publishing requires the attestation "I have reviewed every task against the source document" (`attest=true`, otherwise `428`). The attestation is logged with the user and time.
+  - Publishing requires the attestation "I have reviewed this checklist and am responsible for its use" (`attest=true`, otherwise `428`). The attestation is logged with the user and time.
   - The technician view has the footer "Follow your company's official procedures; this checklist is an aid".
   - CSV, Markdown and JSON exports carry the disclaimer.
 - **Deployment:** see [DEPLOY.md](DEPLOY.md), which covers GitHub Pages static export, the Docker API on Render or Fly, Gumroad setup and the launch checklist.
