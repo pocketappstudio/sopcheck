@@ -70,7 +70,7 @@ echo "8/8 verifying live site"
 S=https://pocketappstudio.github.io/sopcheck
 for i in $(seq 1 40); do   # wait for the Pages build to finish and the new bundle (containing the Worker URL) to be served
   st=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN_ROWBIN" "https://api.github.com/repos/$PAGES_REPO/pages/builds/latest" | python3 -c "import json,sys;print(json.load(sys.stdin).get('status'))" 2>/dev/null || echo "?")
-  hit=$(curl -s "$S/login/" | grep -o '/_next/static/[^"]*\.js' | sort -u | head -40 | while read -r f; do curl -s "https://pocketappstudio.github.io/sopcheck$f" | grep -c "$URL" | grep -qv '^0$' && echo hit && break; done)
+  hit=$({ curl -s "$S/login/" | grep -o '/_next/static/[^"]*\.js' | sort -u | head -40 | while read -r f; do curl -s "https://pocketappstudio.github.io/sopcheck$f" | grep -c "$URL" | grep -qv '^0$' && echo hit && break; done; } || true)
   [ "$st" = built ] && [ "$hit" = hit ] && break; sleep 10
 done
 [ "${hit:-}" = hit ] || echo "warning: new bundle not detected yet; continuing to verification"

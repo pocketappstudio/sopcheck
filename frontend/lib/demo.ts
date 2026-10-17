@@ -77,7 +77,7 @@ async function aiHealthy() {
 }
 function setBadge() {
   const b = document.getElementById("demo-badge-label");
-  if (b) b.textContent = aiOn ? "Preview demo · AI parsing (limited, falls back to offline parser) · " : "Preview demo · runs in your browser · offline parser · ";
+  if (b) b.textContent = aiOn ? "Preview demo · AI parsing on: uploaded text goes to an AI service (Cloudflare → OpenAI); falls back to offline parser · " : "Preview demo · runs in your browser · offline parser · ";
 }
 
 function persist(py: Pyodide) { return new Promise<void>((r) => py.FS.syncfs(false, () => r())); }
