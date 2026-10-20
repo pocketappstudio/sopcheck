@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { api, type Plans } from "@/lib/api";
 import { Nav } from "@/components/ui";
 import { SiteFooter } from "@/components/legal";
+import { useHidePurchase } from "@/lib/native";
 
 export default function PricingPage() {
+  const hidePurchase = useHidePurchase();
   const [p, setP] = useState<Plans | null>(null);
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => { api.plans().then(setP).catch((e) => setErr(e.message)); }, []);
@@ -24,14 +26,14 @@ export default function PricingPage() {
             {p.plans.map((pl) => (
               <Card key={pl.key} name={pl.name} price={`$${pl.price_usd_month.toFixed(0)}`} period="per month" techs={pl.max_technicians}
                     parses={pl.max_parses_month} highlight={pl.key === "team"}
-                    cta={pl.purchasable
+                    cta={hidePurchase ? <span className="block rounded-xl bg-slate-100 py-2.5 text-center text-sm font-semibold text-slate-500" data-testid={`managed-${pl.key}`}>Managed by your organization</span> : pl.purchasable
                       ? <a href={pl.checkout_url} target="_blank" rel="noopener" data-testid={`buy-${pl.key}`}
                            className="block rounded-xl bg-teal-500 py-2.5 text-center text-sm font-semibold text-white hover:bg-teal-600">Buy on Gumroad</a>
                       : <span className="block rounded-xl bg-slate-200 py-2.5 text-center text-sm font-semibold text-slate-500" title="Gumroad product not configured yet">Available soon on Gumroad</span>} />
             ))}
           </div>
         )}
-        <div className="mt-8 grid gap-4 text-sm text-slate-600 md:grid-cols-2">
+        {!hidePurchase && <div className="mt-8 grid gap-4 text-sm text-slate-600 md:grid-cols-2">
           <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
             <div className="font-semibold text-slate-900">How activation works</div>
             <ol className="mt-2 list-decimal space-y-1 pl-5">
@@ -44,7 +46,7 @@ export default function PricingPage() {
             <div className="font-semibold text-slate-900">Billing, cancellations &amp; refunds</div>
             <p className="mt-2">{p?.support ?? "Handled through Gumroad."} You can cancel your membership in Gumroad at any time. Limits are counted per company: technician seats, and documents parsed per calendar month (UTC). Editing a checklist does not count as a parse.</p>
           </div>
-        </div>
+        </div>}
         <p className="mt-6 text-xs text-slate-500">
           SOPCheck is an informational tool only. AI-generated checklists must be reviewed against your official procedures before use. See the{" "}
           <Link href="/terms" className="underline">Terms of Service</Link>.

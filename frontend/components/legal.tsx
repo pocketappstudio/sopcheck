@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { api, type Me } from "@/lib/api";
+import { useHidePurchase } from "@/lib/native";
 
 export const AI_DRAFT_BANNER = "AI-generated draft — verify against your official SOP before publishing.";
 export const ATTESTATION = "I have reviewed this checklist and am responsible for its use";
@@ -69,11 +70,12 @@ export function TechnicianFooter() {
 }
 
 export function SiteFooter() {
+  const hidePurchase = useHidePurchase();
   return (
     <footer className="mx-auto max-w-6xl px-4 pb-8 pt-6 text-center text-xs text-slate-400">
       SOPCheck is an informational tool, not a substitute for official procedures. ·{" "}
       <Link href="/pricing" className="underline">Pricing</Link> · <Link href="/terms" className="underline">Terms</Link> ·{" "}
-      <Link href="/privacy" className="underline">Privacy</Link> · Billing &amp; refunds via Gumroad
+      <Link href="/privacy" className="underline">Privacy</Link>{hidePurchase ? null : <> · Billing &amp; refunds via Gumroad</>}
     </footer>
   );
 }

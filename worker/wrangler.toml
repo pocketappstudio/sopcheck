@@ -5,7 +5,7 @@ workers_dev = true
 
 # CORS allow-list (comma separated). Production = the Pages preview only.
 [vars]
-ALLOWED_ORIGINS = "https://pocketappstudio.github.io"
+ALLOWED_ORIGINS = "https://pocketappstudio.github.io,capacitor://localhost,https://localhost"
 DAILY_CAP_USD = "0.50"
 IP_HOURLY_CALLS = "10"
 IP_DAILY_CALLS = "30"

@@ -4,7 +4,10 @@
 // in-browser, and data is saved in this browser's IndexedDB. Reset with ?reset-demo=1.
 export const DEMO = process.env.NEXT_PUBLIC_DEMO === "1";
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
+// Native app builds vendor Pyodide + wheels into the bundle (offline); the web preview uses the CDN.
+const LOCAL_PY = process.env.NEXT_PUBLIC_PYODIDE_LOCAL === "1";
+const PYODIDE = LOCAL_PY ? `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/vendor/pyodide/` : "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
+const LOCAL_PY_PACKAGES = ["sqlalchemy", "pydantic", "tzdata", "ssl", "httpx", "bcrypt", "anyio", "sniffio", "idna", "typing-extensions", "annotated-types", "h11", "httpcore", "certifi"];
 const AI_URL = (process.env.NEXT_PUBLIC_AI_PROXY_URL ?? "").replace(/\/$/, "");
 let aiOn = false;
 const PY_PACKAGES = ["micropip", "sqlalchemy", "pydantic", "tzdata", "ssl", "httpx"];
@@ -37,8 +40,14 @@ async function start() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const py: Pyodide = await (window as any).loadPyodide({ indexURL: PYODIDE });
   overlay("Loading components…");
-  await py.loadPackage(PY_PACKAGES);
-  await py.pyimport("micropip").install(PIP_PACKAGES);
+  if (LOCAL_PY) {
+    await py.loadPackage(LOCAL_PY_PACKAGES);
+    const wheels: string[] = await (await fetchOrig(PYODIDE + "wheels/index.json")).json();
+    for (const w of wheels) py.unpackArchive(await (await fetchOrig(PYODIDE + "wheels/" + w)).arrayBuffer(), "wheel");
+  } else {
+    await py.loadPackage(PY_PACKAGES);
+    await py.pyimport("micropip").install(PIP_PACKAGES);
+  }
   const bundle: Record<string, string> = await (await fetchOrig(`${BASE_PATH}/demo/bundle.json`)).json();
   for (const [path, b64] of Object.entries(bundle)) {
     if (path.startsWith("/seed/")) continue;

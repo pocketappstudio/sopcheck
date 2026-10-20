@@ -10,6 +10,7 @@ import { RequireAuth } from "@/components/auth";
 import { AiDraftBanner, PublishAttestation, SiteFooter } from "@/components/legal";
 import { Badge, Nav, Spinner, VMBadge } from "@/components/ui";
 import { formatDateTime, viewerZone } from "@/lib/time";
+import { NATIVE, scanDocument, useHidePurchase } from "@/lib/native";
 
 type Tab = "checklist" | "safety" | "json" | "audit";
 const FIELDS: (keyof Omit<EditableTask, "_key" | "id" | "task_id" | "is_safety_critical">)[] =
@@ -55,6 +56,19 @@ function ManagerDashboard() {
     finally { setBusy(null); }
   }
 
+  const [scanStatus, setScanStatus] = useState("");
+  async function scan() {
+    setBusy("scan"); setError(null); setScanStatus("Opening camera…");
+    try {
+      const text = await scanDocument(setScanStatus);
+      if (!text) return;
+      if (text.trim().length < 20) throw new Error("Couldn't read enough text from that photo. Try again in good light, with the page flat and filling the frame.");
+      setScanStatus("Building the checklist…");
+      const d = await api.parseText(text, `Scanned SOP ${new Date().toLocaleDateString()}`);
+      load(d); setTab("checklist"); await refresh();
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    finally { setBusy(null); setScanStatus(""); }
+  }
   const onFile = (f?: File | null) => f && run("upload", api.upload(f), (d) => { load(d); setTab("checklist"); });
 
   // ---- editing ----
@@ -137,6 +151,12 @@ function ManagerDashboard() {
               <div className="text-xs text-slate-500">.txt, .md or .pdf (scanned PDFs are OCR&apos;d)</div>
               <input ref={fileRef} type="file" accept=".txt,.md,.pdf" className="hidden" data-testid="file-input" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ""; }} />
             </div>
+            {NATIVE && (
+              <button onClick={scan} disabled={!!busy} data-testid="scan-camera"
+                      className="w-full rounded-2xl bg-slate-800 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                {busy === "scan" ? (scanStatus || "Scanning…") : "📷 Scan a paper SOP with the camera"}
+              </button>
+            )}
             {error && <div className="rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-red-200" role="alert">{error}</div>}
             <div className="rounded-2xl bg-white p-3 ring-1 ring-slate-200">
               <div className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Documents</div>
@@ -537,6 +557,7 @@ function BillingPanel() {
     try { const r = await api.activateLicense(key.trim()); setB(r); setKey(""); setMsg({ ok: true, text: `Activated: ${r.plan_name}` }); }
     catch (e) { setMsg({ ok: false, text: e instanceof Error ? e.message : String(e) }); } finally { setBusy(false); }
   }
+  const hidePurchase = useHidePurchase();
   if (!b) return null;
   const bar = (used: number, max: number) => (
     <div className="mt-1 h-1.5 rounded-full bg-slate-100"><div className={`h-1.5 rounded-full ${used >= max ? "bg-red-500" : "bg-teal-500"}`} style={{ width: `${Math.min(100, (100 * used) / Math.max(1, max))}%` }} /></div>
@@ -552,6 +573,7 @@ function BillingPanel() {
       <div className="mt-2 text-xs text-slate-600">Technicians {b.usage.technicians}/{b.limits.max_technicians}{bar(b.usage.technicians, b.limits.max_technicians)}</div>
       <div className="mt-2 text-xs text-slate-600">Parses this month {b.usage.parses_this_month}/{b.limits.max_parses_month}{bar(b.usage.parses_this_month, b.limits.max_parses_month)}</div>
       {b.license.last4 && <div className="mt-2 text-[11px] text-slate-400">License …{b.license.last4} · {b.license.status}</div>}
+      {hidePurchase ? <div className="mt-3 text-[11px] text-slate-500" data-testid="billing-managed">Your organization&apos;s account owner manages the plan.</div> : <>
       <div className="mt-3 flex gap-1">
         <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Gumroad license key" aria-label="Gumroad license key"
                className="min-w-0 flex-1 rounded-lg bg-slate-50 px-2 py-1.5 text-xs ring-1 ring-slate-200" />
@@ -559,6 +581,7 @@ function BillingPanel() {
       </div>
       {msg && <div className={`mt-2 text-xs ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</div>}
       <div className="mt-2 text-[11px] text-slate-400">Billing, cancellations &amp; refunds are handled through Gumroad.</div>
+      </>}
     </div>
   );
 }

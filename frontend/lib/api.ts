@@ -5,7 +5,9 @@
 export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? "").replace(/\/$/, "");
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 import { DEMO, installDemo } from "./demo";
+import { installNative } from "./native";
 installDemo();
+installNative();
 const TOKENS = !!API_BASE || DEMO;     // Bearer-token sessions (static hosting / in-browser demo)
 const TOKEN_KEY = "sopcheck.session";
 const tokenStore = {
@@ -93,7 +95,21 @@ export class ApiError extends Error {
   constructor(public status: number, message: string, public detail?: unknown) { super(message); }
 }
 
+// Apple 5.1.2(i): one-time consent before document text is first sent to the third-party AI service.
+const AI_CONSENT_KEY = "sopcheck.ai_consent.v1";
+const AI_PATH = /^\/api\/documents\/(upload|parse-text|\d+\/(reparse|parse))/;
+function ensureAiConsent(path: string, method?: string) {
+  if (typeof window === "undefined" || (method ?? "GET").toUpperCase() !== "POST" || !AI_PATH.test(path)) return;
+  try { if (window.localStorage.getItem(AI_CONSENT_KEY) === "yes") return; } catch { /* ignore */ }
+  const ok = window.confirm(
+    "AI parsing\n\nTo build your checklist, the text of this document is sent to OpenAI (an AI service provider) for processing. " +
+    "OpenAI's published API policy says it does not use this data to train models by default. See our Privacy Policy. Don't upload documents you aren't allowed to share.\n\nAllow AI parsing?");
+  if (!ok) throw new ApiError(0, "AI parsing was not allowed. You can allow it the next time you parse a document.");
+  try { window.localStorage.setItem(AI_CONSENT_KEY, "yes"); } catch { /* ignore */ }
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  ensureAiConsent(path, init?.method);
   const res = await fetch(API_BASE + path, authInit(init));
   if (res.status === 401 && typeof window !== "undefined" && !path.startsWith("/api/auth/")) {
     tokenStore.set(null);

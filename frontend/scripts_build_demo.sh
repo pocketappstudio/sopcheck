@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 SEED_DB="${SEED_DB:-demo/seed.db}"
-BASE="${NEXT_PUBLIC_BASE_PATH:-/sopcheck}"
+BASE="${NEXT_PUBLIC_BASE_PATH-/sopcheck}"
 python3 - "$SEED_DB" <<'PY'
 import base64, json, pathlib, sys
 root = pathlib.Path("..").resolve(); out = {}
