@@ -10,9 +10,10 @@ import base64, json, pathlib, sys
 root = pathlib.Path("..").resolve(); out = {}
 def add(dest, p): out[dest] = base64.b64encode(p.read_bytes()).decode()
 for p in (root / "backend" / "app").glob("*.py"): add(f"/sop/backend/app/{p.name}", p)
-for d in ("prompts", "legal"):
-    for p in (root / d).rglob("*"):
-        if p.is_file(): add(f"/sop/{d}/{p.relative_to(root / d)}", p)
+for p in (root / "prompts").rglob("*"):
+    if p.is_file(): add(f"/sop/prompts/{p.relative_to(root / 'prompts')}", p)
+for n in ("terms.md", "privacy.md"):   # only the published legal docs; never drafts or internal notes
+    add(f"/sop/legal/{n}", root / "legal" / n)
 add("/sop/demo_boot.py", pathlib.Path("demo/demo_boot.py"))
 add("/seed/app.db", pathlib.Path(sys.argv[1]))
 pathlib.Path("public/demo").mkdir(parents=True, exist_ok=True)
