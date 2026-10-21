@@ -74,7 +74,7 @@ export function SiteFooter() {
   return (
     <footer className="mx-auto max-w-6xl px-4 pb-8 pt-6 text-center text-xs text-slate-400">
       SOPCheck is an informational tool, not a substitute for official procedures. ·{" "}
-      <Link href="/pricing" className="underline">Pricing</Link> · <Link href="/terms" className="underline">Terms</Link> ·{" "}
+      {hidePurchase ? null : <><Link href="/pricing" className="underline">Pricing</Link> · </>}<Link href="/support" className="underline">Support</Link> · <Link href="/terms" className="underline">Terms</Link> ·{" "}
       <Link href="/privacy" className="underline">Privacy</Link>{hidePurchase ? null : <> · Billing &amp; refunds via Gumroad</>}
     </footer>
   );

@@ -10,6 +10,7 @@ const PYODIDE = LOCAL_PY ? `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/vendor/py
 const LOCAL_PY_PACKAGES = ["sqlalchemy", "pydantic", "tzdata", "ssl", "httpx", "bcrypt", "anyio", "sniffio", "idna", "typing-extensions", "annotated-types", "h11", "httpcore", "certifi"];
 const AI_URL = (process.env.NEXT_PUBLIC_AI_PROXY_URL ?? "").replace(/\/$/, "");
 let aiOn = false;
+const NATIVE_APP = process.env.NEXT_PUBLIC_NATIVE === "1";   // store app: no web-preview badge or "demo" wording
 const PY_PACKAGES = ["micropip", "sqlalchemy", "pydantic", "tzdata", "ssl", "httpx"];
 const PIP_PACKAGES = ["fastapi==0.115.6", "python-multipart", "pyjwt", "pypdf", "bcrypt"];
 
@@ -18,7 +19,7 @@ type PyHandle = (m: string, u: string, h: string, b: Uint8Array | null) => Promi
 type Pyodide = any;
 let boot: Promise<{ handle: PyHandle; py: Pyodide }> | null = null;
 
-function overlay(text: string | null, foot = "Runs entirely in your browser. The first load takes a few seconds.") {
+function overlay(text: string | null, foot = NATIVE_APP ? "The first launch takes a few seconds." : "Runs entirely in your browser. The first load takes a few seconds.") {
   if (typeof document === "undefined") return;
   let el = document.getElementById("demo-boot");
   if (text === null) { el?.remove(); return; }
@@ -27,7 +28,7 @@ function overlay(text: string | null, foot = "Runs entirely in your browser. The
     el.setAttribute("style", "position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(241,245,249,.92);font:14px system-ui;color:#334155");
     document.body.appendChild(el);
   }
-  el.innerHTML = `<div style="text-align:center;max-width:320px"><div style="font-size:28px">✓</div><b>SOPCheck demo</b><br>${text}<br><span style="font-size:12px;color:#64748b">${foot}</span></div>`;
+  el.innerHTML = `<div style="text-align:center;max-width:320px"><div style="font-size:28px">✓</div><b>${NATIVE_APP ? "SOPCheck" : "SOPCheck demo"}</b><br>${text}<br><span style="font-size:12px;color:#64748b">${foot}</span></div>`;
 }
 
 function loadScript(src: string) {
@@ -35,7 +36,7 @@ function loadScript(src: string) {
 }
 
 async function start() {
-  overlay("Starting the demo…");
+  overlay(NATIVE_APP ? "Starting SOPCheck…" : "Starting the demo…");
   await loadScript(PYODIDE + "pyodide.js");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const py: Pyodide = await (window as any).loadPyodide({ indexURL: PYODIDE });
@@ -64,7 +65,7 @@ async function start() {
     py.FS.writeFile("/data/app.db", Uint8Array.from(atob(bundle["/seed/app.db"]), (c) => c.charCodeAt(0)));
     if (reset) { sessionStorage.removeItem("sopcheck.session"); }
   }
-  overlay("Starting the app server…");
+  overlay(NATIVE_APP ? "Getting things ready…" : "Starting the app server…");
   aiOn = await aiHealthy();
   const pre = aiOn ? `import os\nos.environ["SOPCHECK_AI_URL"]=${JSON.stringify(AI_URL)}\n` : "";
   py.runPython(pre + (bundle["/sop/demo_boot.py"] ? atob(bundle["/sop/demo_boot.py"]) : ""));
@@ -101,7 +102,7 @@ async function demoFetch(input: RequestInfo | URL, init?: RequestInit): Promise<
   req.headers.forEach((v, k) => { headers[k] = v; });
   const body = req.method === "GET" || req.method === "HEAD" ? null : new Uint8Array(await req.arrayBuffer());
   const parsing = req.method === "POST" && /^\/api\/documents\/(upload|parse-text)$/.test(url.pathname);
-  if (parsing && aiOn) { overlay("Parsing with AI… this can take up to a minute.", "Demo only: the document text is sent to an AI service for parsing. Don't upload confidential files."); await new Promise((r) => setTimeout(r, 60)); }
+  if (parsing && aiOn) { overlay("Parsing with AI… this can take up to a minute.", NATIVE_APP ? "The document text is sent to an AI service for parsing. Review the draft before publishing." : "Demo only: the document text is sent to an AI service for parsing. Don't upload confidential files."); await new Promise((r) => setTimeout(r, 60)); }
   let r: [number, string, Uint8Array];
   try { r = (await handle(req.method, url.pathname + url.search, JSON.stringify(headers), body)).toJs(); } finally { if (parsing && aiOn) overlay(null); }
   if (req.method !== "GET") await persist(py);
@@ -121,7 +122,7 @@ export function installDemo() {
     return orig(input, init);
   };
   const badge = () => {
-    if (document.getElementById("demo-badge")) return;
+    if (NATIVE_APP || document.getElementById("demo-badge")) return;
     const b = document.createElement("div"); b.id = "demo-badge";
     b.setAttribute("style", "position:fixed;left:8px;bottom:8px;z-index:9998;background:#0f766e;color:#fff;font:11px system-ui;padding:4px 8px;border-radius:999px;opacity:.9");
     b.innerHTML = `<span id="demo-badge-label">Preview demo · runs in your browser · offline parser · </span><a href="${BASE_PATH}/login/?reset-demo=1" style="color:#fff;text-decoration:underline">reset</a>`;

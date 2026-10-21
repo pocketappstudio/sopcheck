@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { API_BASE, go } from "@/lib/api";
 import { SiteFooter } from "@/components/legal";
+import { useHidePurchase } from "@/lib/native";
 
 export default function SignupPage() {
   const [f, setF] = useState({ company_name: "", full_name: "", email: "", password: "" });
+  const hidePurchase = useHidePurchase();
   const [agree, setAgree] = useState(false);
   const [version, setVersion] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -36,8 +38,8 @@ export default function SignupPage() {
           <span className="text-xl font-semibold tracking-tight text-slate-800">SOPCheck</span>
         </div>
         <form onSubmit={submit} className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" data-testid="signup">
-          <h1 className="text-lg font-semibold text-slate-900">Start your free trial</h1>
-          <p className="mt-1 text-sm text-slate-500">You get 14 days to try SOPCheck. No card is required to start.</p>
+          <h1 className="text-lg font-semibold text-slate-900">{hidePurchase ? "Create your organization account" : "Start your free trial"}</h1>
+          <p className="mt-1 text-sm text-slate-500">{hidePurchase ? "Set up a SOPCheck workspace for your team." : "You get 14 days to try SOPCheck. No card is required to start."}</p>
           <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-slate-400">Company<input required value={f.company_name} onChange={set("company_name")} className={input} /></label>
           <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-slate-400">Your name<input required value={f.full_name} onChange={set("full_name")} className={input} /></label>
           <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-slate-400">Work login<input required type="email" autoComplete="username" value={f.email} onChange={set("email")} className={input} /></label>

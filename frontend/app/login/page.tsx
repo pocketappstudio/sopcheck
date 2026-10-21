@@ -5,6 +5,7 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { api, ApiError, go } from "@/lib/api";
 import { Spinner } from "@/components/ui";
+import { useHidePurchase } from "@/lib/native";
 
 const SHOW_DEMO = process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS !== "false";
 const DEMO = [
@@ -16,6 +17,7 @@ const DEMO = [
 
 function LoginForm() {
   const params = useSearchParams();
+  const hidePurchase = useHidePurchase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -60,7 +62,7 @@ function LoginForm() {
             {busy ? <Spinner /> : "Sign in"}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-slate-500">New to SOPCheck? <Link href="/signup" className="font-medium text-teal-700 underline">Start a 14-day free trial</Link> · <Link href="/pricing" className="underline">Pricing</Link></p>
+        {hidePurchase ? <p className="mt-4 text-center text-sm text-slate-500">New to SOPCheck? <Link href="/signup" className="font-medium text-teal-700 underline">Create an organization account</Link></p> : <p className="mt-4 text-center text-sm text-slate-500">New to SOPCheck? <Link href="/signup" className="font-medium text-teal-700 underline">Start a 14-day free trial</Link> · <Link href="/pricing" className="underline">Pricing</Link></p>}
         {SHOW_DEMO && (
           <div className="mt-4 rounded-2xl bg-white/70 p-4 ring-1 ring-slate-200">
             <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Demo accounts (tap to fill)</div>

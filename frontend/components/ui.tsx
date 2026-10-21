@@ -42,20 +42,20 @@ export function Badge({ icon, children, tone = "slate" }: { icon?: string; child
 export function Nav({ active }: { active: "home" | "manager" | "technician" | "login" | "account" }) {
   const { me, logout } = useAuth();
   const item = (href: string, label: string, key: string) => (
-    <Link href={href} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${active === key ? "bg-white text-slate-900 shadow-sm" : "text-slate-300 hover:text-white"}`}>
+    <Link href={href} className={`whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-medium transition sm:px-3 sm:text-sm ${active === key ? "bg-white text-slate-900 shadow-sm" : "text-slate-300 hover:text-white"}`}>
       {label}
     </Link>
   );
   return (
     <header className="sticky top-0 z-20 bg-slate-800/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-white">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-4">
+        <Link href="/" className="flex shrink-0 items-center gap-2 text-white">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-teal-500 text-lg font-bold">✓</span>
-          <span className="font-semibold tracking-tight">SOPCheck</span>
+          <span className={`font-semibold tracking-tight ${me ? "hidden sm:inline" : ""}`}>SOPCheck</span>
         </Link>
         {me && (
-          <div className="flex items-center gap-2">
-            <nav className="flex gap-1 rounded-xl bg-slate-700/60 p-1">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+            <nav className="flex gap-0.5 rounded-xl bg-slate-700/60 p-1 sm:gap-1">
               {me.role !== "technician" && item("/manager", "Manager", "manager")}
               {item("/technician", "Technician", "technician")}
               {item("/account", "Account", "account")}
@@ -65,7 +65,7 @@ export function Nav({ active }: { active: "home" | "manager" | "technician" | "l
               <div className="text-[10px] uppercase tracking-wide text-slate-400">{me.role} · {me.company_name}</div>
             </div>
             <button onClick={logout} data-testid="logout" title="Sign out"
-                    className="rounded-lg px-2 py-1.5 text-xs font-medium text-slate-300 ring-1 ring-slate-600 hover:bg-slate-700 hover:text-white">
+                    className="shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-medium text-slate-300 ring-1 ring-slate-600 hover:bg-slate-700 hover:text-white">
               Sign out
             </button>
           </div>

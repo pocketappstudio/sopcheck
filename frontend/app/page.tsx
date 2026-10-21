@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { Nav } from "@/components/ui";
 import { SiteFooter } from "@/components/legal";
+import { useHidePurchase } from "@/lib/native";
 
 export default function Home() {
+  const hidePurchase = useHidePurchase();
   return (
     <>
       <Nav active="home" />
@@ -17,7 +19,7 @@ export default function Home() {
         </p>
         <div className="mt-6 flex gap-2">
           <Link href="/login" className="inline-block rounded-xl bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white">Sign in</Link>
-          <Link href="/pricing" className="inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-300">Pricing · 14-day free trial</Link>
+          {!hidePurchase && <Link href="/pricing" className="inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-300">Pricing · 14-day free trial</Link>}
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Link href="/manager" className="group rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">

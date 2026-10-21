@@ -12,6 +12,16 @@ export default function PricingPage() {
   const [p, setP] = useState<Plans | null>(null);
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => { api.plans().then(setP).catch((e) => setErr(e.message)); }, []);
+  if (hidePurchase) return (
+    <>
+      <Nav active="home" />
+      <main className="mx-auto max-w-2xl px-4 py-10" data-testid="pricing-managed">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Your organization&apos;s account</h1>
+        <p className="mt-2 text-slate-600">Your organization&apos;s account owner manages SOPCheck for your team. Sign in with the account your organization set up.</p>
+      </main>
+      <SiteFooter />
+    </>
+  );
   return (
     <>
       <Nav active="home" />
